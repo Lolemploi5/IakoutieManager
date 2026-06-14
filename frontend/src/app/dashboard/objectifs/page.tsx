@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AlertCircle, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { AlertCircle, Loader2, Target } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -31,8 +31,7 @@ type SessionResponse = {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
-export function DashboardClient() {
-  const router = useRouter();
+export default function ObjectifsPage() {
   const [session, setSession] = useState<SessionResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -76,19 +75,13 @@ export function DashboardClient() {
     };
   }, []);
 
-  useEffect(() => {
-    if (!loading && !error && !session?.authenticated) {
-      router.replace("/signin");
-    }
-  }, [loading, error, router, session?.authenticated]);
-
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center px-4">
         <Card className="w-full max-w-md border-white/10 bg-white/5 text-white shadow-2xl shadow-black/20 backdrop-blur">
           <CardHeader className="space-y-3 text-center">
             <Loader2 className="mx-auto size-8 animate-spin text-white/70" />
-            <CardTitle className="text-2xl text-white">Chargement du dashboard</CardTitle>
+            <CardTitle className="text-2xl text-white">Chargement des objectifs</CardTitle>
             <CardDescription className="text-white/60">
               Vérification de la session Discord en cours.
             </CardDescription>
@@ -111,7 +104,23 @@ export function DashboardClient() {
   }
 
   if (!session?.authenticated) {
-    return null;
+    return (
+      <div className="flex min-h-screen items-center justify-center px-4">
+        <Card className="w-full max-w-xl border-white/10 bg-white/5 text-white shadow-2xl shadow-black/20 backdrop-blur">
+          <CardHeader>
+            <CardTitle className="text-2xl text-white">Connexion requise</CardTitle>
+            <CardDescription className="text-white/60">
+              Tu dois te connecter avec Discord pour accéder aux objectifs.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild className="rounded-full">
+              <a href={`${API_URL}/auth/discord/login`}>Se connecter avec Discord</a>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   if (!session.member_in_guild || !session.has_required_role) {
@@ -121,7 +130,7 @@ export function DashboardClient() {
           <CardHeader>
             <CardTitle className="text-2xl text-white">Accès refusé</CardTitle>
             <CardDescription className="text-white/60">
-              {session.access_message ?? "Tu dois faire partie du serveur Discord configuré pour accéder au dashboard."}
+              {session.access_message ?? "Tu dois faire partie du serveur Discord configuré pour accéder aux objectifs."}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -154,28 +163,31 @@ export function DashboardClient() {
         <SidebarInset className="bg-background/95">
           <main className="flex min-h-screen flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
             <div className="flex flex-col gap-2">
-              <Badge className="w-fit">Connecté via Discord</Badge>
+              <Badge className="w-fit">Objectifs</Badge>
               <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-                Dashboard Iakoutie Manager
+                Suivi des objectifs
               </h1>
+              <p className="max-w-2xl text-sm leading-6 text-white/60">
+                Cette page servira à suivre les objectifs et les étapes importantes du projet.
+              </p>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
-              {[
-                { label: "Utilisateur", value: session.username ?? "Inconnu" },
-                { label: "Serveur", value: session.guild_name ?? "Discord" },
-                { label: "Rôles autorisés", value: `${session.roles.length}` },
-              ].map((item) => (
-                <Card key={item.label} className="border-white/10 bg-white/5 text-white shadow-lg shadow-black/10 backdrop-blur">
-                  <CardHeader className="pb-2">
-                    <CardDescription className="text-white/50">{item.label}</CardDescription>
-                    <CardTitle className="text-2xl text-white">{item.value}</CardTitle>
-                  </CardHeader>
-                </Card>
-              ))}
-            </div>
-
-            
+            <Card className="border-white/10 bg-white/5 text-white shadow-lg shadow-black/10 backdrop-blur">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-xl text-white">
+                  <Target className="size-5" />
+                  Objectifs du moment
+                </CardTitle>
+                <CardDescription className="text-white/60">
+                  Tu peux brancher ici les vrais indicateurs et objectifs métier.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm text-white/70">
+                <p>• Définir les objectifs prioritaires du serveur.</p>
+                <p>• Suivre l’avancement des membres ou des projets internes.</p>
+                <p>• Afficher des métriques et des jalons dans le dashboard.</p>
+              </CardContent>
+            </Card>
           </main>
         </SidebarInset>
       </div>

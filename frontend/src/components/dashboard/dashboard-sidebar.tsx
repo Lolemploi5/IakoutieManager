@@ -1,6 +1,8 @@
 "use client";
 
-import { BarChart3, Bell, Cog, LayoutDashboard, ShieldCheck } from "lucide-react";
+import { BarChart3, Bell, Cog, LayoutDashboard, ShieldCheck, Target } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -18,11 +20,12 @@ import {
 } from "@/components/ui/sidebar";
 
 const navigationItems = [
-  { title: "Dashboard", icon: LayoutDashboard, active: true },
-  { title: "Statistiques", icon: BarChart3, active: false },
-  { title: "Notifications", icon: Bell, active: false },
-  { title: "Sécurité", icon: ShieldCheck, active: false },
-  { title: "Paramètres", icon: Cog, active: false },
+  { title: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
+  { title: "Statistiques", icon: BarChart3, href: "/dashboard/statistiques" },
+  { title: "Objectifs", icon: Target, href: "/dashboard/objectifs" },
+  { title: "Notifications", icon: Bell, href: "/dashboard/notifications" },
+  { title: "Sécurité", icon: ShieldCheck, href: "/dashboard/securite" },
+  { title: "Paramètres", icon: Cog, href: "/dashboard/parametres" },
 ];
 
 type DashboardSidebarProps = {
@@ -32,6 +35,7 @@ type DashboardSidebarProps = {
 
 export function DashboardSidebar({ username, avatarUrl }: DashboardSidebarProps) {
   const initial = username?.slice(0, 2).toUpperCase() ?? "IM";
+  const pathname = usePathname();
 
   return (
     <Sidebar collapsible="icon">
@@ -58,11 +62,11 @@ export function DashboardSidebar({ username, avatarUrl }: DashboardSidebarProps)
             <SidebarMenu>
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    isActive={item.active}
-                  >
-                    <item.icon />
-                    <span>{item.title}</span>
+                  <SidebarMenuButton asChild isActive={pathname === item.href}>
+                    <Link href={item.href}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
